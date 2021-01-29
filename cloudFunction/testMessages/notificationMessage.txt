@@ -1,0 +1,23 @@
+{
+    "alertThresholdExceeded": 1.0,
+    "forecastThresholdExceeded": 1.0,
+    "costAmount": 90.00,
+    "budgetAmount": 100.00
+}
+
+{
+    "forecastThresholdExceeded": 1.0,
+    "costAmount": 90.00,
+    "budgetAmount": 100.00
+}
+
+{
+    "forecastThresholdExceeded": 1.0,
+    "costAmount": 110.00,
+    "budgetAmount": 100.00
+}
+
+{
+    "costAmount": 90.00,
+    "budgetAmount": 100.00
+}
