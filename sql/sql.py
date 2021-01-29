@@ -14,7 +14,7 @@ class Stock(Base):
 class Prices(Base):
     __tablename__ = 'stock_prices'
     isin = Column(String(12), primary_key = True)
-    date = Column(DateTime, primary_key = True)
+    date = Column(Date, primary_key = True)
     price = Column(Float)
 
 def constructDB(engine):
