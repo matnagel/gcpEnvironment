@@ -8,13 +8,13 @@ Base = declarative_base()
 
 class Stock(Base):
     __tablename__ = 'tracked_stocks'
-    isin = Column(String, primary_key = True)
-    name = Column(String)
+    isin = Column(String(12), primary_key = True)
+    name = Column(String(20))
 
 db_user = os.environ["DB_USER"]
 db_pass = os.environ["DB_PASS"]
 db_name = os.environ["DB_NAME"]
-db_socket_dir = os.environ.get("DB_SOCKET_DIR", "sqlproxy")
+db_socket_dir = os.environ.get("DB_SOCKET_DIR", "/cloudproxy")
 cloud_sql_connection_name = os.environ["CLOUD_SQL_CONNECTION_NAME"]
 
 
