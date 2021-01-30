@@ -5,7 +5,7 @@ from sqlalchemy import Column, String, Date, Float
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from Engines import myGCPEngine
+from src.Engines import myGCPEngine
 
 Base = declarative_base()
 
@@ -20,9 +20,9 @@ class Price(Base):
     __tablename__ = 'stock_prices'
     isin = Column(String(12), primary_key = True)
     date = Column(Date, primary_key = True)
-    last = Column(Float)
-    low = Column(Float)
-    high = Column(Float)
+    last = Column(Float, nullable=False)
+    low = Column(Float, nullable=False)
+    high = Column(Float, nullable=False)
     def __str__(self):
         return f'{self.isin} {self.date} - {self.last}'
 

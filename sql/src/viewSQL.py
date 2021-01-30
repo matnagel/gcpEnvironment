@@ -1,7 +1,7 @@
 import pandas as pd
 import datetime as dt
 
-from SqlDataSources import Stock, Price, myGCPDataSource
+from src.SqlDataSources import Stock, Price, myGCPDataSource
 
 source = myGCPDataSource
 session = source.getSession()
