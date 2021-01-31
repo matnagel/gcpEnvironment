@@ -34,7 +34,7 @@ def verifyPreconditions(session):
     lastUpdate = session.query(Price.date).order_by(Price.date.desc()).first()
     today = date.today()
     if lastUpdate.date >= today:
-        raise RuntimeError(f'Already have entries with date {today}. Only updates once a day.')
+        raise RuntimeError(f'Already have entries with date {lastUpdate.date}, which is later than today {today}. Only updates once a day.')
 
 def pubsubEntry(event, context):
     print("Update Tradegate triggered")
