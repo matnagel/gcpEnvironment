@@ -9,7 +9,7 @@ class MyGCPEngine():
         self.db_user = os.environ["DB_USER"]
         self.db_pass = os.environ["DB_PASS"]
         self.db_name = os.environ["DB_NAME"]
-        self.db_socket_dir = os.environ.get("DB_SOCKET_DIR", "/cloudproxy")
+        self.db_socket_dir = os.environ.get("DB_SOCKET_DIR", "/cloudsql")
         self.cloud_sql_connection_name = os.environ["CLOUD_SQL_CONNECTION_NAME"]
         self.socketPath = f'{self.db_socket_dir}/{self.cloud_sql_connection_name}'
     def _constructEngine(self):

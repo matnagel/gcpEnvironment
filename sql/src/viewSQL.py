@@ -10,7 +10,7 @@ engine = source.engine.getEngine()
 print(f'Tables: {engine.table_names()}\n')
 
 print(f'Price - Number of rows: {session.query(Price).count()}')
-query = session.query(Price).order_by(Price.date.desc()).limit(5)
+query = session.query(Price).order_by(Price.date.desc()).limit(20)
 for priceInfo in query:
     print(priceInfo)
 print('\n')

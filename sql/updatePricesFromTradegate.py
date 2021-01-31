@@ -29,16 +29,20 @@ def getStockInformation(stocks):
 
 def verifyPreconditions(session):
     stocks = session.query(Stock)
-    assert len(list(stocks)) < 25
+    if len(list(stocks)) >= 25:
+        raise ValueError('There are more than 25 stocks to update')
     lastUpdate = session.query(Price.date).order_by(Price.date.desc()).first()
     today = date.today()
-    assert lastUpdate.date < today
+    if lastUpdate.date >= today:
+        raise RuntimeError(f'Already have entries with date {today}. Only updates once a day.')
 
-source = myGCPDataSource
-session = source.getSession()
-verifyPreconditions(session)
-
-stocks = session.query(Stock)
-newPrices = getStockInformation(stocks)
-source.addRows(newPrices)
-source.commit()
+def pubsubEntry(event, context):
+    print("Update Tradegate triggered")
+    source = myGCPDataSource
+    session = source.getSession()
+    verifyPreconditions(session)
+    
+    stocks = session.query(Stock)
+    newPrices = getStockInformation(stocks)
+    source.addRows(newPrices)
+    source.commit()
