@@ -41,8 +41,12 @@ def pubsubEntry(event, context):
     source = myGCPDataSource
     session = source.getSession()
     verifyPreconditions(session)
-    
+    print('Preconditions meet')
+
     stocks = session.query(Stock)
     newPrices = getStockInformation(stocks)
+    print(f'Received stock prices of {date.today()}')
+
     source.addRows(newPrices)
     source.commit()
+    print('Successfully added new prices to table')
