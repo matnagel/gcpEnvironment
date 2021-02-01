@@ -39,7 +39,7 @@ def checkBilling(data, context):
         return
 
     if 'alertThresholdExceeded' in pubsub_json:
-        print(f"Alert threshold {pubsub_json['alertThresholdExceeded']} exceeded")
+        print(f"Alert threshold {pubsub_json['alertThresholdExceeded']} with costs {cost_amount} exceeded")
         disableBilling(projects)
         return
 
