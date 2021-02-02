@@ -27,23 +27,22 @@ def getStockInformation(stocks):
             print(f"Could not extract price for {isin}")
     return dataList
 
-def verifyPreconditions(session):
-    stocks = session.query(Stock)
+def verifyPreconditions(source):
+    stocks = source.query(Stock)
     if len(list(stocks)) >= 25:
         raise ValueError('There are more than 25 stocks to update')
-    lastUpdate = session.query(Price.date).order_by(Price.date.desc()).first()
+    lastUpdate = source.query(Price.date).order_by(Price.date.desc()).first()
     today = date.today()
     if lastUpdate.date >= today:
-        raise RuntimeError(f'Already have entries with date {lastUpdate.date}, which is later than today {today}. Only updates once a day.')
+        raise RuntimeError(f'Already have entries with date {lastUpdate.date}, which is today {today} or later. Only updates once a day.')
 
 def pubsubEntry(event, context):
     print("Update Tradegate triggered")
     source = myGCPDataSource
-    session = source.getSession()
-    verifyPreconditions(session)
+    verifyPreconditions(source)
     print('Preconditions meet')
 
-    stocks = session.query(Stock)
+    stocks = source.query(Stock)
     newPrices = getStockInformation(stocks)
     print(f'Received stock prices of {date.today()}')
 

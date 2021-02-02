@@ -27,21 +27,23 @@ class Price(Base):
         return f'{self.isin} {self.date} - {self.last}'
 
 class MyGCPDataSource:
-    def __init__(self):
-        self.engine = myGCPEngine
+    def __init__(self, engine=myGCPEngine):
+        self.engine = engine
         Session = sessionmaker(bind=self.engine.getEngine())
         self.session = Session()
     def purgeDB(self):
         Base.metadata.drop_all(self.engine.getEngine())
     def constructDB(self):
         Base.metadata.create_all(self.engine.getEngine(), Base.metadata.tables.values(), checkfirst=True)
+    def getTableNames(self):
+        return self.engine.getTableNames()
     def __str__(self):
         return f'{self.engine}'
+    def query(self, c):
+        return self.session.query(c)
     def addRows(self, rows):
         self.session.add_all(rows)
     def commit(self):
         self.session.commit()
-    def getSession(self):
-        return self.session
 
 myGCPDataSource = MyGCPDataSource()

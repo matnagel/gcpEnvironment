@@ -20,6 +20,8 @@ class MyGCPEngine():
             database=self.db_name,  # e.g. "my-database-name"
             query={ "unix_socket": self.socketPath })
         self.engine = sqlalchemy.create_engine(engineDef, echo=False)
+    def getTableNames(self):
+        return self.engine.table_names()
     def getEngine(self):
         return self.engine
     def __str__():

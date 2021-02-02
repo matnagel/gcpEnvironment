@@ -4,18 +4,16 @@ import datetime as dt
 from src.SqlDataSources import Stock, Price, myGCPDataSource
 
 source = myGCPDataSource
-session = source.getSession()
 
-engine = source.engine.getEngine()
-print(f'Tables: {engine.table_names()}\n')
+print(f'Tables: {source.getTableNames()}\n')
 
-print(f'Price - Number of rows: {session.query(Price).count()}')
-query = session.query(Price).order_by(Price.date.desc()).limit(20)
+print(f'Price - Number of rows: {source.query(Price).count()}')
+query = source.query(Price).order_by(Price.date.desc()).limit(20)
 for priceInfo in query:
     print(priceInfo)
 print('\n')
 
-print(f'Stock - Number of rows: {session.query(Stock).count()}')
-query = session.query(Stock).limit(5)
+print(f'Stock - Number of rows: {source.query(Stock).count()}')
+query = source.query(Stock).limit(5)
 for stock in query:
     print(stock)
