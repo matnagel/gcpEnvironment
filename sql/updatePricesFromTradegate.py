@@ -1,7 +1,9 @@
+import concurrent.futures
 import requests as rq
 
 from bs4 import BeautifulSoup
 from datetime import date
+import time
 from src.SqlDataSources import myGCPDataSource, Price, Stock
 
 def extractId(soup, css):
@@ -12,20 +14,21 @@ def extractId(soup, css):
     return float(txt)
     #return atof(txt)
 
+def requestTradegate(isin):
+    rawPage = rq.get('https://www.tradegate.de/orderbuch.php?isin=' + isin)
+    soupPage = BeautifulSoup(rawPage.text, 'html.parser')
+    try:
+        last = extractId(soupPage, '#last')
+        high = extractId(soupPage, '#high')
+        low = extractId(soupPage, '#low')
+    except ValueError:
+        print(f"Malformed page returned for {isin}")
+    return Price(isin=isin, date=date.today(), last=last, high=high, low=low)
+
 def getStockInformation(stocks):
-    dataList = []
-    for stock in stocks:
-        isin = stock.isin
-        rawPage = rq.get('https://www.tradegate.de/orderbuch.php?isin=' + isin)
-        soupPage = BeautifulSoup(rawPage.text, 'html.parser')
-        try:
-            last = extractId(soupPage, '#last')
-            high = extractId(soupPage, '#high')
-            low = extractId(soupPage, '#low')
-            dataList.append(Price(isin=isin, date=date.today(), last=last, high=high, low=low))
-        except ValueError:
-            print(f"Could not extract price for {isin}")
-    return dataList
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        newPrices = executor.map(lambda stock : requestTradegate(stock.isin), stocks)
+    return newPrices
 
 def verifyPreconditions(source):
     stocks = source.query(Stock)
@@ -43,8 +46,10 @@ def pubsubEntry(event, context):
     print('Preconditions meet')
 
     stocks = source.query(Stock)
+    startTime = time.time()
     newPrices = getStockInformation(stocks)
-    print(f'Received stock prices of {date.today()}')
+    endTime = time.time()
+    print(f'Received stock prices of {date.today()} in {endTime - startTime:.2f}')
 
     source.addRows(newPrices)
     source.commit()

@@ -3,11 +3,15 @@ import json
 import os
 from googleapiclient import discovery
 
-class EnviromentException(Exception):
+class EnvironmentException(Exception):
   pass
 
 PROJECT_ID = os.getenv('GCP_PROJECT')
-RESOURCE_NAME = f'projects/{PROJECT_ID}'
+
+def readBillingInformation(data):
+    pubsub_data = base64.b64decode(data['data']).decode('utf-8')
+    info = json.loads(pubsub_data)
+    return info
 
 def checkBilling(data, context):
     print('Check billing notification')
@@ -15,10 +19,9 @@ def checkBilling(data, context):
     if not 'data' in data:
         raise RuntimeError('Called without billing notification data.')
 
-    pubsub_data = base64.b64decode(data['data']).decode('utf-8')
-    pubsub_json = json.loads(pubsub_data)
-    cost_amount = pubsub_json['costAmount']
-    budget_amount = pubsub_json['budgetAmount']
+    info = readBillingInformation(data)
+    cost_amount = info['costAmount']
+    budget_amount = info['budgetAmount']
 
     billing = discovery.build(
         'cloudbilling',
@@ -26,7 +29,7 @@ def checkBilling(data, context):
         cache_discovery=False
     )
     projects = billing.projects()
-
+    projectName = f'projects/{PROJECT_ID}'
 
     if PROJECT_ID is None:
         raise EnvironmentException('No project specified in environment variable GCP_PROJECT')
@@ -35,32 +38,32 @@ def checkBilling(data, context):
 
     if cost_amount > budget_amount:
         print(f'Current costs: {cost_amount} are larger than budget {budget_amount}')
-        disableBilling(projects)
+        disableBilling(projectName, projects)
         return
 
-    if 'alertThresholdExceeded' in pubsub_json:
-        print(f"Alert threshold {pubsub_json['alertThresholdExceeded']} with costs {cost_amount} exceeded")
-        disableBilling(projects)
+    if 'alertThresholdExceeded' in info:
+        print(f"Alert threshold {info['alertThresholdExceeded']} with costs {cost_amount} exceeded")
+        disableBilling(projectName, projects)
         return
 
-    if 'forecastThresholdExceeded' in pubsub_json:
-        print(f"Forecast threshold {pubsub_json['forecastThresholdExceeded']} exceeded")
-        disableBilling(projects)
+    if 'forecastThresholdExceeded' in info:
+        print(f"Forecast threshold {info['forecastThresholdExceeded']} exceeded")
+        disableBilling(projectName, projects)
         return
 
-    billingStatus = isBillingEnabled(RESOURCE_NAME, projects)
+    billingStatus = isBillingEnabled(projectName, projects)
     print(f'No action necessary. Current cost: {cost_amount} and billingEnabled: {billingStatus}')
 
-def disableBilling(projects):
+def disableBilling(projectName, projects):
     try:
-        billingEnabled = isBillingEnabled(RESOURCE_NAME, projects)
+        billingEnabled = isBillingEnabled(projectName, projects)
     except Exception:
-        print(f'Unable to determine if billing is enabled on project {RESOURCE_NAME}. Trying to disabling anyways.')
-        disableBillingForProject(RESOURCE_NAME, projects)
+        print(f'Unable to determine if billing is enabled on project {projectName}. Trying to disabling anyways.')
+        disableBillingForProject(projectName, projects)
         raise RuntimeError('Could not determine whether billing is enabled, while trying to disable billing')
 
     if billingEnabled:
-        disableBillingForProject(RESOURCE_NAME, projects)
+        disableBillingForProject(projectName, projects)
     else:
         print('Billing already disabled')
 
