@@ -38,6 +38,6 @@ def pubsubEntryPoint(event, context):
 
     bucket = Bucket("tradegatescrapes")
     dateString = date.today().strftime("%y%m%d")
-    for stock in scrapeList:
-        blobname = f'{dateString}scrape{stock.isin}.raw'
-        blob = bucket.saveStringToBlob(blobname, stock.content)
+    folder = { f'{dateString}scrape{stock.isin}.raw':stock.content for stock in scrapeList }
+    bucket.saveDictToZipBlob(f'{dateString}scrapes.zip', folder)
+    print(f'Stored scrapings in lake')
