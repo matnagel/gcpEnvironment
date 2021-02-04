@@ -31,6 +31,7 @@ def pubsubEntryPoint(event, context):
     source = StdSource()
     verifyPreconditions(source)
     stocks = source.query(Stock)
+
     startTime = time.time()
     scrapeList = scrapeStocks(stocks)
     endTime = time.time()
@@ -38,6 +39,6 @@ def pubsubEntryPoint(event, context):
 
     bucket = Bucket("tradegatescrapes")
     dateString = date.today().strftime("%y%m%d")
-    folder = { f'{dateString}scrape{stock.isin}.raw':stock.content for stock in scrapeList }
-    bucket.saveDictToZipBlob(f'{dateString}scrapes.zip', folder)
+    folder = { f'{dateString}_{stock.isin}.html':stock.content for stock in scrapeList }
+    bucket.saveDictToZipBlob(f'{dateString}Scrapes.zip', folder)
     print(f'Stored scrapings in lake')

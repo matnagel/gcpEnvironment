@@ -1,13 +1,14 @@
 from google.cloud.storage import Client, Blob
 from io import BytesIO, StringIO
 
-from zipfile import ZipFile
+from zipfile import ZipFile, ZIP_DEFLATED
 
 def createZip(folder):
     zipMemory = BytesIO()
-    zhandle = ZipFile(zipMemory, 'w')
+    zhandle = ZipFile(zipMemory, 'w', ZIP_DEFLATED)
     for fname, cont in folder.items():
         zhandle.writestr(fname, cont)
+    zhandle.close()
     zipMemory.seek(0)
     return zipMemory
 
