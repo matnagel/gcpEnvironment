@@ -5,10 +5,10 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 def createZip(folder):
     zipMemory = BytesIO()
-    zhandle = ZipFile(zipMemory, 'w', ZIP_DEFLATED)
-    for fname, cont in folder.items():
-        zhandle.writestr(fname, cont)
-    zhandle.close()
+    with ZipFile(zipMemory, 'w', ZIP_DEFLATED) as zhandle:
+        for fname, cont in folder.items():
+            zhandle.writestr(fname, cont)
+    #zhandle.close()
     zipMemory.seek(0)
     return zipMemory
 
