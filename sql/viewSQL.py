@@ -1,9 +1,9 @@
 import pandas as pd
 import datetime as dt
 
-from src.SqlDataSources import Stock, Price, myGCPDataSource
+from gcp.SqlSources import Stock, Price, StdSource
 
-source = myGCPDataSource
+source = StdSource()
 
 print(f'Tables: {source.getTableNames()}\n')
 
