@@ -15,8 +15,6 @@ test:
 libFiles = gcp/Engines.py gcp/SqlSources.py gcp/Storage.py
 mainFile = scrapeTradegate.py
 
-zipName = $(shell date +%y%m%d_%H%M)scrapeTradegate.zip
-
 $(TMPDIR) : $(addprefix $(SOURCEDIR)/, $(libFiles)) requirements.txt
 	mkdir $(TMPDIR)
 	cp $(mainFile) $(TMPDIR)/main.py
