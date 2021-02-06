@@ -25,4 +25,4 @@ $(TMPDIR) : $(addprefix $(SOURCEDIR)/, $(libFiles)) requirements.txt
 	cp requirements.txt $(TMPDIR)
 
 deploy: $(TMPDIR) 
-	gcloud functions deploy $(PROJECTNAME) --region=$(REGION) --entry-point=pubsubEntryPoint --ingress-settings=internal-only --memory=128MB --runtime=python38 --service-account=$(SERVICEACCOUNT) --source=$(TMPDIR) --stage-bucket=$(STAGEBUCKET) --timeout=30s --set-env-vars=[ $(ENVVAR) ] --max-instances=1 --trigger-topic=$(TOPIC)
+	gcloud functions deploy $(PROJECTNAME) --region=$(REGION) --entry-point=pubsubEntryPoint --ingress-settings=internal-only --memory=128MB --runtime=python38 --service-account=$(SERVICEACCOUNT) --source=$(TMPDIR) --stage-bucket=$(STAGEBUCKET) --timeout=30s --set-env-vars=$(ENVVAR) --max-instances=1 --trigger-topic=$(TOPIC)
