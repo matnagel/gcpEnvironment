@@ -19,7 +19,7 @@ $(TMPDIR) : $(CONTENTPATH) $(mainFiles)
 	mkdir $(TMPDIR)
 	cp $(mainFiles) $(TMPDIR)
 	mkdir $(TMPDIR)/content
-	cp $(CONTENTPATH) $(TMPDIR)/content
+	cp -r $(CONTENTPATH) $(TMPDIR)/content
 
 deploy: $(TMPDIR) 
 	echo "Ready to deploy"
