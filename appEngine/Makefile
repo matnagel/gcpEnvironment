@@ -22,4 +22,4 @@ $(TMPDIR) : $(CONTENTPATH) $(mainFiles)
 	cp -r $(CONTENTPATH)/. $(TMPDIR)/content
 
 deploy: $(TMPDIR) 
-	echo "Ready to deploy"
+	gcloud app deploy $(TMPDIR)
