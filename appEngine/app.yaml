@@ -6,4 +6,6 @@ automatic_scaling:
 
 handlers:
 - url: /cert
+  static_files: content/index.html
+- url: /cert
   static_dir: content
