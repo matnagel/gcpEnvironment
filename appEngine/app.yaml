@@ -5,5 +5,5 @@ automatic_scaling:
         max_instances: 1
 
 handlers:
-- url: /dev
+- url: /cert
   static_dir: content
