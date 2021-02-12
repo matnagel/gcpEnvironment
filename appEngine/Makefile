@@ -15,7 +15,7 @@ test:
 
 mainFiles = app.yaml main.py requirements.txt
 
-$(TMPDIR) : $(CONTENTPATH) mainFiles
+$(TMPDIR) : $(CONTENTPATH) $(mainFiles)
 	mkdir $(TMPDIR)
 	cp $(mainFiles) $(TMPDIR)
 	mkdir $(TMPDIR)/content
