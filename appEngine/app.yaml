@@ -9,7 +9,4 @@ handlers:
   static_files: content/index.html
   upload: content/index.html
 - url: /cert
-  static_files: content/index.html
-  upload: content/index.html
-- url: /cert
   static_dir: content

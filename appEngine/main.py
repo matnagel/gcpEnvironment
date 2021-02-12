@@ -9,6 +9,11 @@ def hello():
     """Return a friendly HTTP greeting."""
     return 'Hello World!'
 
+@app.route('/cert/')
+def cert():
+    """This handler makes flask redirect '/cert' to '/cert/', which then
+    gets caught by app.yaml."""
+    return 'cert - Hello World!'
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
