@@ -5,12 +5,14 @@ from apache_beam.io import fileio
 import concurrent.futures
 import requests as rq
 
-from datetime import date, datetime
+from datetime import datetime
 import time
 
 from bs4 import BeautifulSoup
 from zipfile import ZipFile, ZIP_DEFLATED
 from gcp.SqlSources import Stock, Price, StdSource
+
+import re
 
 class Webpage:
     def __init__(self, isin, scrapeDate, content):
@@ -31,6 +33,13 @@ class Webpage:
 def filesToProcess(bucketName):
     return fileio.MatchFiles(f"{bucketName}/*") | fileio.ReadMatches()
 
+def laterThanCutOff(cutOffDate, f):
+    m = re.search('([0-9]{6})Scrapes', f.metadata.path)
+    if m:
+        cur = datetime.strptime(m[1], "%y%m%d")
+        return cur >= cutOffDate
+    return False
+
 def unzipFiles(zipHandle):
     with zipHandle.open() as zipMemory, ZipFile(zipMemory, 'r', ZIP_DEFLATED) as zipFile:
         for name in zipFile.namelist():
@@ -50,11 +59,6 @@ class saveToDB(beam.DoFn):
         self.source.commit()
         yield f"Committed {element}"
 
-def runBeam():
-    bucketName = 'localBucket'
-    with beam.Pipeline() as p:
-        print("Starting pipeline")
-        p | filesToProcess(bucketName) | LoadFile(bucketName)
 
 def extractId(soup, css):
     #setlocale(LC_NUMERIC, 'de_DE.UTF-8')
@@ -83,6 +87,21 @@ def toPrice(webpage):
 #     today = date.today()
 #     if lastUpdate.date >= today:
 #         raise RuntimeError(f'Already have entries with date {lastUpdate.date}, which is today {today} or later. Only updates once a day.')
+
+def loadTradegatePipeline(bucketName, cutOffDate):
+    return filesToProcess(bucketName) \
+              | beam.Filter(lambda f: laterThanCutOff(cutOffDate, f)) \
+              | beam.FlatMap(unzipFiles) \
+              | beam.Map(convertToWebpage) \
+              | beam.Map(toPrice) \
+              | beam.ParDo(saveToDB())
+
+
+def runBeam():
+    bucketName = 'localBucket'
+    cutOffDate = datetime.strptime('2021-02-14', "%Y-%m-%d")
+    with beam.Pipeline() as p:
+            p | loadTradegatePipeline(bucketName, cutOffDate)
 
 if __name__ == '__main__':
     runBeam()
