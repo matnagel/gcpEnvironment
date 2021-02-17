@@ -24,5 +24,5 @@ class AlchemyEngine():
         return self.engine.table_names()
     def getEngine(self):
         return self.engine
-    def __str__():
+    def __str__(self):
         return f'Engine({self.socketPath})'

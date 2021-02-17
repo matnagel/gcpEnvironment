@@ -42,5 +42,9 @@ class StdSource:
         return self.session.query(c)
     def addRows(self, rows):
         self.session.add_all(rows)
+    def addRow(self, row):
+        self.session.add(row)
     def commit(self):
         self.session.commit()
+    def tearDown(self):
+        self.session.close()
