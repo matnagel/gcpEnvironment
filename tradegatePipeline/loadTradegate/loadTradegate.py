@@ -89,7 +89,7 @@ def toPrice(webpage):
 #         raise RuntimeError(f'Already have entries with date {lastUpdate.date}, which is today {today} or later. Only updates once a day.')
 
 def combinePrices(iterator):
-    return reduce(lambda x,y: x + "\n" + y, iterator)
+    return reduce(lambda x,y: x + "\n" + y, iterator, "")
 
 
 def loadTradegatePipeline(bucketName, cutOffDate):
