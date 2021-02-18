@@ -105,16 +105,13 @@ def loadTradegatePipeline(bucketName, cutOffDate):
 
 def runBeam():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cutOffDate')
+    parser.add_argument('--cutOffDate', required=True)
     parser.add_argument('--bucketName', required=True)
     args, beam_args = parser.parse_known_args(argv)
     vargs = vars(args)
 
     bucketName = vargs['bucketName']
-    if vargs['cutOffDate']:
-        cutOffDate = datetime.strptime(vargs['cutOffDate'], "%Y-%m-%d")
-    else:
-        cutOffDate = datetime.today()
+    cutOffDate = datetime.strptime(vargs['cutOffDate'], "%Y-%m-%d")
 
     with beam.Pipeline(argv=beam_args) as p:
             p | loadTradegatePipeline(bucketName, cutOffDate)

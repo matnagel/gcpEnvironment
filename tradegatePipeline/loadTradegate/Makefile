@@ -3,6 +3,8 @@ PROJECTNAME = loadTradegate
 include ~/GCP/conf/global.conf
 include ~/GCP/conf/$(PROJECTNAME).conf
 
+TMPDIR:=$(DEPLOYDIR)/$(shell date +%s)$(PROJECTNAME)
+
 export PYTHONPATH=$(SOURCEDIR)
 
 .PHONY: test deploy
@@ -10,8 +12,18 @@ export PYTHONPATH=$(SOURCEDIR)
 test:
 	python3 -m unittest discover test
 
-deploy:
-	python3 -m loadTradegate \
+libFiles = gcp/Engines.py gcp/SqlSources.py gcp/Storage.py
+mainFile = loadTradegate.py
+
+$(TMPDIR) : $(addprefix $(SOURCEDIR)/, $(libFiles))
+	mkdir $(TMPDIR)
+	cp $(mainFile) $(TMPDIR)/main.py
+	mkdir $(TMPDIR)/gcp
+	cp $(addprefix $(SOURCEDIR)/, $(libFiles)) $(TMPDIR)/gcp
+
+deploy: $(TMPDIR) 
+	cd $(TMPDIR);
+	python3 -m main.py \
 		--runner DataflowRunner \
 		--project $(PROJECTID) \
 		--staging_location gs://$(DEPLOYBUCKET)/staging \
