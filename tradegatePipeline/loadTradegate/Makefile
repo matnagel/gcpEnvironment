@@ -16,4 +16,8 @@ deploy:
 		--project $(PROJECTID) \
 		--staging_location gs://$(DEPLOYBUCKET)/staging \
 		--temp_location gs://$(DEPLOYBUCKET)/temp \
-		--template_location gs://$(DEPLOYBUCKET)/templates/$(TEMPLATENAME)
+		--template_location gs://$(DEPLOYBUCKET)/templates/$(TEMPLATENAME) \
+		--region $(REGION) \
+		--save_main_session True \
+		--bucketName $(TRADEGATEBUCKET) \
+		--cutOffDate $(CUTOFFDATE)
