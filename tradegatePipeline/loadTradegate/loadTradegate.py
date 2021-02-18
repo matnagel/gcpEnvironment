@@ -1,18 +1,18 @@
 import apache_beam as beam
 from apache_beam.io import fileio
-#from google.cloud import storage
-
-import concurrent.futures
-import requests as rq
 
 from datetime import datetime
 import time
 
 from bs4 import BeautifulSoup
 from zipfile import ZipFile, ZIP_DEFLATED
-from gcp.SqlSources import Stock, Price, StdSource
+from gcp.SqlSources import Price, StdSource
+
+import argparse
+from sys import argv
 
 import re
+from functools import reduce
 
 class Webpage:
     def __init__(self, isin, scrapeDate, content):
@@ -20,7 +20,7 @@ class Webpage:
         self.scrapeDate = scrapeDate
         self.content = content
     def __str__(self):
-        return f"Webpage of {self.isin} on {self.scrapeDate}"
+        return f"Webpage({self.isin}, {self.scrapeDate})"
     @staticmethod
     def recoverFromFile(filename, content):
         filename = filename.replace('_', '.')
@@ -37,7 +37,7 @@ def laterThanCutOff(cutOffDate, f):
     m = re.search('([0-9]{6})Scrapes', f.metadata.path)
     if m:
         cur = datetime.strptime(m[1], "%y%m%d")
-        return cur >= cutOffDate
+        return cur > cutOffDate
     return False
 
 def unzipFiles(zipHandle):
@@ -88,19 +88,35 @@ def toPrice(webpage):
 #     if lastUpdate.date >= today:
 #         raise RuntimeError(f'Already have entries with date {lastUpdate.date}, which is today {today} or later. Only updates once a day.')
 
+def combinePrices(iterator):
+    return reduce(lambda x,y: x + "\n" + y, iterator)
+
+
 def loadTradegatePipeline(bucketName, cutOffDate):
     return filesToProcess(bucketName) \
               | beam.Filter(lambda f: laterThanCutOff(cutOffDate, f)) \
               | beam.FlatMap(unzipFiles) \
               | beam.Map(convertToWebpage) \
               | beam.Map(toPrice) \
-              | beam.ParDo(saveToDB())
-
+              | beam.Map(lambda x: x.__str__()) \
+              | beam.CombineGlobally(combinePrices) \
+              | beam.Map(print)
+              #| beam.ParDo(saveToDB())
 
 def runBeam():
-    bucketName = 'localBucket'
-    cutOffDate = datetime.strptime('2021-02-14', "%Y-%m-%d")
-    with beam.Pipeline() as p:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--cutOffDate')
+    parser.add_argument('--bucketName', required=True)
+    args, beam_args = parser.parse_known_args(argv)
+    vargs = vars(args)
+
+    bucketName = vargs['bucketName']
+    if vargs['cutOffDate']:
+        cutOffDate = datetime.strptime(vargs['cutOffDate'], "%Y-%m-%d")
+    else:
+        cutOffDate = datetime.today()
+
+    with beam.Pipeline(argv=beam_args) as p:
             p | loadTradegatePipeline(bucketName, cutOffDate)
 
 if __name__ == '__main__':

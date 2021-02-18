@@ -1,7 +1,7 @@
 PROJECTNAME = loadTradegate
 
 include ~/GCP/conf/global.conf
-#include ~/GCP/conf/$(PROJECTNAME).conf
+include ~/GCP/conf/$(PROJECTNAME).conf
 
 export PYTHONPATH=$(SOURCEDIR)
 
@@ -10,5 +10,10 @@ export PYTHONPATH=$(SOURCEDIR)
 test:
 	python3 -m unittest discover test
 
-deploy: $(TMPDIR) 
-	echo "Deploy to Dataflow"
+deploy:
+	python3 -m loadTradegate \
+		--runner DataflowRunner \
+		--project $(PROJECTID) \
+		--staging_location gs://$(DEPLOYBUCKET)/staging \
+		--temp_location gs://$(DEPLOYBUCKET)/temp \
+		--template_location gs://$(DEPLOYBUCKET)/templates/$(TEMPLATENAME)
