@@ -14,6 +14,8 @@ from sys import argv
 import re
 from functools import reduce
 
+import logging
+
 class Webpage:
     def __init__(self, isin, scrapeDate, content):
         self.isin = isin
@@ -57,7 +59,7 @@ class saveToDB(beam.DoFn):
     def process(self, element):
         self.source.addRow(element)
         self.source.commit()
-        yield f"Committed {element}"
+        yield element
 
 
 def extractId(soup, css):
@@ -93,14 +95,15 @@ def combinePrices(iterator):
 
 
 def loadTradegatePipeline(bucketName, cutOffDate):
-    return filesToProcess(bucketName) \
+    return 'Load Files' >> filesToProcess(bucketName) \
               | beam.Filter(lambda f: laterThanCutOff(cutOffDate, f)) \
-              | beam.FlatMap(unzipFiles) \
-              | beam.Map(convertToWebpage) \
+              | 'Unzip Files' >> beam.FlatMap(unzipFiles) \
+              | 'Extract Prices' >> beam.Map(convertToWebpage) \
               | beam.Map(toPrice) \
-              | beam.Map(lambda x: x.__str__()) \
+              | 'Save result in DB' >> beam.ParDo(saveToDB()) \
+              | 'Compute Result' >> beam.Map(lambda x: x.__str__()) \
               | beam.CombineGlobally(combinePrices) \
-              | beam.Map(print)
+              | 'Log output' >> beam.Map(logging.info)
               #| beam.ParDo(saveToDB())
 
 def runBeam():
