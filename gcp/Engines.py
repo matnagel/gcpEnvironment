@@ -27,9 +27,10 @@ class AlchemyEngine():
     def getConfRequirements():
         return ['DB_USER', 'DB_PASS', 'DB_NAME', 'DB_SOCKET_DIR',\
                 'CLOUD_SQL_CONNECTION_NAME']
-    def verifyConfRequirements(conf):
+    def getMissingConfRequirements(conf):
+        missing = []
         for key in AlchemyEngine.getConfRequirements():
             if not key in conf:
-                return False
-        return True
+                missing.append(key)
+        return missing
 

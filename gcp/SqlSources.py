@@ -43,9 +43,9 @@ class StdSource:
                 {'DB_SOCKET_DIR': '/cloudsql'},
                 os.environ)
         conf.update(eConf)
-
-        if not AlchemyEngine.verifyConfRequirements(eConf):
-            raise Exception("Not all conf keys for engine present")
+        missKeys = AlchemyEngine.getMissingConfRequirements(conf)
+        if missKeys:
+            raise Exception(f"Engine needs the keys: {missKeys}")
 
         self.engine = AlchemyEngine(conf)
         Session = sessionmaker(bind=self.engine.getEngine())
