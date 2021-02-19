@@ -52,8 +52,10 @@ def convertToWebpage(t):
     return Webpage.recoverFromFile(t[0], t[1])
 
 class saveToDB(beam.DoFn):
+    def __init__(self, sqlConf):
+        self.sqlConf = sqlConf
     def setup(self):
-        self.source = StdSource()
+        self.source = StdSource(self.sqlConf)
     def teardown(self):
         self.source.tearDown()
     def process(self, element):
@@ -94,13 +96,13 @@ def combinePrices(iterator):
     return reduce(lambda x,y: x + "\n" + y, iterator, "")
 
 
-def loadTradegatePipeline(bucketName, cutOffDate):
+def loadTradegatePipeline(bucketName, cutOffDate, sqlConf):
     return 'Load Files' >> filesToProcess(bucketName) \
               | beam.Filter(lambda f: laterThanCutOff(cutOffDate, f)) \
               | 'Unzip Files' >> beam.FlatMap(unzipFiles) \
               | 'Extract Prices' >> beam.Map(convertToWebpage) \
               | beam.Map(toPrice) \
-              | 'Save result in DB' >> beam.ParDo(saveToDB()) \
+              | 'Save result in DB' >> beam.ParDo(saveToDB(sqlConf)) \
               | 'Compute Result' >> beam.Map(lambda x: x.__str__()) \
               | beam.CombineGlobally(combinePrices) \
               | 'Log output' >> beam.Map(logging.info)
@@ -110,14 +112,24 @@ def runBeam():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cutOffDate', required=True)
     parser.add_argument('--bucketName', required=True)
+    parser.add_argument('--dbuser', required=True)
+    parser.add_argument('--dbpass', required=True)
+    parser.add_argument('--dbname', required=True)
+    parser.add_argument('--cloudsqlconnectionname', required=True)
     args, beam_args = parser.parse_known_args(argv)
     vargs = vars(args)
 
     bucketName = vargs['bucketName']
     cutOffDate = datetime.strptime(vargs['cutOffDate'], "%Y-%m-%d")
 
+    sqlConf = dict()
+    sqlConf['DB_USER'] = vargs['dbuser']
+    sqlConf['DB_PASS'] = vargs['dbpass']
+    sqlConf['DB_NAME'] = vargs['dbname']
+    sqlConf['CLOUD_SQL_CONNECTION_NAME'] = vargs['cloudsqlconnectionname']
+
     with beam.Pipeline(argv=beam_args) as p:
-            p | loadTradegatePipeline(bucketName, cutOffDate)
+            p | loadTradegatePipeline(bucketName, cutOffDate, sqlConf)
 
 if __name__ == '__main__':
     runBeam()

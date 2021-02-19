@@ -33,5 +33,9 @@ deploy: $(TMPDIR)
 		--region $(REGION) \
 		--save_main_session True \
 		--setup_file ./setup.py \
+		--dbuser $(DB_USER) \
+		--dbpass $(DB_PASS) \
+		--dbname $(DB_NAME) \
+		--cloudsqlconnectionname $(CLOUD_SQL_CONNECTION_NAME) \
 		--bucketName $(TRADEGATEBUCKET) \
 		--cutOffDate $(CUTOFFDATE)

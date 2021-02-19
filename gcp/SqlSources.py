@@ -6,6 +6,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from gcp.Engines import AlchemyEngine
 
+import os
+
 Base = declarative_base()
 
 class Stock(Base):
@@ -25,9 +27,27 @@ class Price(Base):
     def __str__(self):
         return f'{self.isin} {self.date} - {self.last}'
 
+def constructConf(confKeys, defaults, env):
+    result = dict()
+    for key in confKeys:
+        if key in env:
+            result[key] = env[key]
+        elif key in defaults:
+            result[key] = defaults[key]
+    return result
+
 class StdSource:
-    def __init__(self):
-        self.engine = AlchemyEngine()
+    def __init__(self, conf=dict()):
+        eConf = constructConf( \
+                AlchemyEngine.getConfRequirements(), \
+                {'DB_SOCKET_DIR': '/cloudsql'},
+                os.environ)
+        conf.update(eConf)
+
+        if not AlchemyEngine.verifyConfRequirements(eConf):
+            raise Exception("Not all conf keys for engine present")
+
+        self.engine = AlchemyEngine(conf)
         Session = sessionmaker(bind=self.engine.getEngine())
         self.session = Session()
     def dropAssociatedTables(self):

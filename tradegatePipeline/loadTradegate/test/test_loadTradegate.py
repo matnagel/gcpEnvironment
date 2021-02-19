@@ -20,8 +20,9 @@ class testScrape(TestCase):
         mockStdSource.addRow = lambda x: store.append(x)
         sqlPatch = patch('loadTradegate.StdSource', return_value=mockStdSource)
         bucketName = 'testBucket'
+        sqlConf = dict()
         with sqlPatch, TestPipeline() as p:
-            pipe = p | loadTradegatePipeline(bucketName, cutOffDate)
+            pipe = p | loadTradegatePipeline(bucketName, cutOffDate, sqlConf)
         self.assertEqual(len(store), 2)
         fstore = list(filter(lambda price: price.isin == 'IE00B3RBWM25', store))
         self.assertEqual(len(fstore), 1)

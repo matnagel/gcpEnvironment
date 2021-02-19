@@ -2,16 +2,14 @@ import os
 import sqlalchemy
 
 class AlchemyEngine():
-    def __init__(self):
-        self._getConfiguration()
-        self._constructEngine()
-    def _getConfiguration(self):
-        self.db_user = os.environ["DB_USER"]
-        self.db_pass = os.environ["DB_PASS"]
-        self.db_name = os.environ["DB_NAME"]
-        self.db_socket_dir = os.environ.get("DB_SOCKET_DIR", "/cloudsql")
-        self.cloud_sql_connection_name = os.environ["CLOUD_SQL_CONNECTION_NAME"]
+    def __init__(self, conf):
+        self.db_user = conf["DB_USER"]
+        self.db_pass = conf["DB_PASS"]
+        self.db_name = conf["DB_NAME"]
+        self.db_socket_dir = conf["DB_SOCKET_DIR"]
+        self.cloud_sql_connection_name = conf["CLOUD_SQL_CONNECTION_NAME"]
         self.socketPath = f'{self.db_socket_dir}/{self.cloud_sql_connection_name}'
+        self._constructEngine()
     def _constructEngine(self):
         engineDef = sqlalchemy.engine.url.URL(
             drivername="mysql+pymysql",
@@ -26,3 +24,12 @@ class AlchemyEngine():
         return self.engine
     def __str__(self):
         return f'Engine({self.socketPath})'
+    def getConfRequirements():
+        return ['DB_USER', 'DB_PASS', 'DB_NAME', 'DB_SOCKET_DIR',\
+                'CLOUD_SQL_CONNECTION_NAME']
+    def verifyConfRequirements(conf):
+        for key in AlchemyEngine.getConfRequirements():
+            if not key in conf:
+                return False
+        return True
+
