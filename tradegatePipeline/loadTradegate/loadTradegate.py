@@ -115,7 +115,9 @@ def runBeam():
     parser.add_argument('--dbuser', required=True)
     parser.add_argument('--dbpass', required=True)
     parser.add_argument('--dbname', required=True)
-    parser.add_argument('--cloudsqlconnectionname', required=True)
+    parser.add_argument('--dbhost', required=True)
+    parser.add_argument('--dbport', required=True)
+
     args, beam_args = parser.parse_known_args(argv)
     vargs = vars(args)
 
@@ -126,7 +128,8 @@ def runBeam():
     sqlConf['DB_USER'] = vargs['dbuser']
     sqlConf['DB_PASS'] = vargs['dbpass']
     sqlConf['DB_NAME'] = vargs['dbname']
-    sqlConf['CLOUD_SQL_CONNECTION_NAME'] = vargs['cloudsqlconnectionname']
+    sqlConf['HOST'] = vargs['dbhost']
+    sqlConf['PORT'] = vargs['dbport']
 
     with beam.Pipeline(argv=beam_args) as p:
             p | loadTradegatePipeline(bucketName, cutOffDate, sqlConf)

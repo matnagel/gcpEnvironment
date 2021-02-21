@@ -4,9 +4,7 @@ from sqlalchemy import Column, String, Date, Float
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from gcp.Engines import AlchemyEngine
-
-import os
+from gcp.Engines import AlchemyEngine, AlchemyEngineConfiguration
 
 Base = declarative_base()
 
@@ -27,26 +25,10 @@ class Price(Base):
     def __str__(self):
         return f'{self.isin} {self.date} - {self.last}'
 
-def constructConf(confKeys, defaults, env):
-    result = dict()
-    for key in confKeys:
-        if key in env:
-            result[key] = env[key]
-        elif key in defaults:
-            result[key] = defaults[key]
-    return result
 
 class StdSource:
-    def __init__(self, conf=dict()):
-        eConf = constructConf( \
-                AlchemyEngine.getConfRequirements(), \
-                {'DB_SOCKET_DIR': '/cloudsql'},
-                os.environ)
-        conf.update(eConf)
-        missKeys = AlchemyEngine.getMissingConfRequirements(conf)
-        if missKeys:
-            raise Exception(f"Engine needs the keys: {missKeys}")
-
+    def __init__(self, confDict=dict()):
+        conf = AlchemyEngineConfiguration.fromDict(confDict)
         self.engine = AlchemyEngine(conf)
         Session = sessionmaker(bind=self.engine.getEngine())
         self.session = Session()

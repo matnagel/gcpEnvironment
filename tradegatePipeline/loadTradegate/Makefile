@@ -36,6 +36,7 @@ deploy: $(TMPDIR)
 		--dbuser $(DB_USER) \
 		--dbpass $(DB_PASS) \
 		--dbname $(DB_NAME) \
-		--cloudsqlconnectionname $(CLOUD_SQL_CONNECTION_NAME) \
+		--dbhost $(DB_HOST) \
+		--dbport $(DB_PORT) \
 		--bucketName $(TRADEGATEBUCKET) \
 		--cutOffDate $(CUTOFFDATE)
