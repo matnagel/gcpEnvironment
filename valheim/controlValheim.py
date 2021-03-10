@@ -14,7 +14,6 @@ def pubsubEntryPoint(event, context):
         raise RuntimeError('Called without message data in event.')
 
     message = readEventInformation(event)
-    print(f"Valheim control: {message}")
 
     credentials = GoogleCredentials.get_application_default()
     service = discovery.build('compute', 'v1', credentials=credentials)
@@ -31,10 +30,10 @@ def pubsubEntryPoint(event, context):
         request = service.instances().start(project=project, zone=zone, instance=instance)
         response = request.execute()
         print(response)
-    if message == 'stop':
+    elif message == 'stop':
         print("Stopping Valheim instance")
         request = service.instances().stop(project=project, zone=zone, instance=instance)
         response = request.execute()
         print(response)
-
-
+    else:
+        raise RuntimeError(f"Unknown message: {message}")
