@@ -3,7 +3,7 @@ PROJECTNAME = loadTradegate
 include ~/GCP/conf/global.conf
 include ~/GCP/conf/$(PROJECTNAME).conf
 
-TMPDIR:=$(DEPLOYDIR)/$(shell date +%s)$(PROJECTNAME)
+TMPDIR:=$(DEPLOYDIR)/$(shell date +%y%m%d)$(PROJECTNAME)
 
 export PYTHONPATH=$(SOURCEDIR)
 
@@ -22,6 +22,7 @@ $(TMPDIR) : $(addprefix $(SOURCEDIR)/, $(libFiles)) setup.py
 	touch $(TMPDIR)/gcp/__init__.py
 	cp $(addprefix $(SOURCEDIR)/, $(libFiles)) $(TMPDIR)/gcp
 	cp setup.py $(TMPDIR)/
+	cp README.txt $(TMPDIR)/
 
 deploy: $(TMPDIR)
 	cd $(TMPDIR); \
