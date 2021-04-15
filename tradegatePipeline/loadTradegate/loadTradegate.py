@@ -1,5 +1,6 @@
 import apache_beam as beam
 from apache_beam.io import fileio
+from apache_beam.options.pipeline_options import PipelineOptions
 
 from datetime import datetime
 import time
@@ -131,7 +132,8 @@ def runBeam():
     sqlConf['HOST'] = vargs['dbhost']
     sqlConf['PORT'] = vargs['dbport']
 
-    with beam.Pipeline(argv=beam_args) as p:
+    pipeline_options = PipelineOptions(beam_args)
+    with beam.Pipeline(options=pipeline_options) as p:
             p | loadTradegatePipeline(bucketName, cutOffDate, sqlConf)
 
 if __name__ == '__main__':

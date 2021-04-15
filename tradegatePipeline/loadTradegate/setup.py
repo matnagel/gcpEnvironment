@@ -1,7 +1,10 @@
-import setuptools
+from setuptools import setup
 
-setuptools.setup(
+setup(
     name='loadTradegatePipeline',
+    author='Matthias Nagel',
+    author_email='matthinagel@gmail.com',
+    url='https://github.com/matnagel/gcpEnvironment',
     version='0.1',
     install_requires=[
         'sqlalchemy',

@@ -33,7 +33,6 @@ deploy: $(TMPDIR)
 		--temp_location gs://$(DEPLOYBUCKET)/temp \
 		--template_location gs://$(DEPLOYBUCKET)/templates/$(TEMPLATENAME) \
 		--region $(REGION) \
-		--save_main_session True \
 		--setup_file ./setup.py \
 		--dbuser $(DB_USER) \
 		--dbpass $(DB_PASS) \
