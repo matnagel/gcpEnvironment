@@ -19,6 +19,7 @@ $(TMPDIR) : $(addprefix $(SOURCEDIR)/, $(libFiles)) setup.py
 	mkdir $(TMPDIR)
 	cp $(mainFile) $(TMPDIR)/main.py
 	mkdir $(TMPDIR)/gcp
+	touch $(TMPDIR)/gcp/__init__.py
 	cp $(addprefix $(SOURCEDIR)/, $(libFiles)) $(TMPDIR)/gcp
 	cp setup.py $(TMPDIR)/
 
