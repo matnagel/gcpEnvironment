@@ -133,6 +133,7 @@ def runBeam():
     sqlConf['PORT'] = vargs['dbport']
 
     pipeline_options = PipelineOptions(beam_args[1:])
+    pipeline_options.view_as(SetupOptions).save_main_session = True
     with beam.Pipeline(options=pipeline_options) as p:
             p | loadTradegatePipeline(bucketName, cutOffDate, sqlConf)
 
