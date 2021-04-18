@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 import os
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
