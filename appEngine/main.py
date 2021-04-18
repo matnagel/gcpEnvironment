@@ -1,7 +1,7 @@
 from flask import Flask, request
 
 import os
-import datetime
+from datetime import datetime
 
 from google.cloud import pubsub_v1
 
