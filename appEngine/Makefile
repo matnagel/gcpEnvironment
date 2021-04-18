@@ -7,10 +7,12 @@ TMPDIR:=$(DEPLOYDIR)/$(shell date +%y%m%d)$(PROJECTNAME)
 
 export PYTHONPATH=$(SOURCEDIR)
 
-.PHONY: test deploy
+.PHONY: test deploy clean
 
 test:
 	python3 -m unittest discover test
+clean:
+	rm -r $(TMPDIR)
 
 mainFiles = app.yaml main.py requirements.txt
 
