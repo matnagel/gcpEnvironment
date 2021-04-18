@@ -31,7 +31,7 @@ def checkValheimPreconditions(secret_input):
     if not secret == secret_input:
         return 'Wrong secret'
 
-    now_time = datetime.now(tz=pytz.utc).time()
+    now_time = datetime.now(tz=pytz.utc).timetz()
     time_cond = now_time >= time(17, 0, tzinfo=local_timezone) and now_time <= time(21, 30, tzinfo=local_timezone)
     if not time_cond:
         return f'{now_time} not between 17:00 and 21:30'
