@@ -18,6 +18,7 @@ $(TMPDIR) : $(CONTENTPATH) $(mainFiles)
 	mkdir $(TMPDIR)
 	cp $(mainFiles) $(TMPDIR)
 	sed -i -- "s/{{ valheimsecret }}/'$(VALHEIMSECRET)'/g" $(TMPDIR)/app.yaml
+	sed -i -- "s/{{ valheimtopic }}/'$(VALHEIMTOPIC)'/g" $(TMPDIR)/app.yaml
 	mkdir $(TMPDIR)/content
 	cp -r $(CONTENTPATH)/. $(TMPDIR)/content
 

@@ -1,9 +1,12 @@
 from flask import Flask, request
 import os
+from google.cloud import pubsub_v1
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
 app = Flask(__name__)
+
+publisher = pubsub_v1.PublisherClient()
 
 @app.route('/')
 def hello():
@@ -22,7 +25,11 @@ def valheim():
     secret = os.getenv('VALHEIMSECRET')
     secret_input = request.args.get('secret')
     if secret == secret_input:
-        return 'Starting Server'
+        topic_name = os.getenv('VALHEIMTOPIC')
+        topic_path = publisher.topic_path(
+                os.environ['GOOGLE_CLOUD_PROJECT'],
+                topic_name)
+        return f"Sending message to {topic_name} to start server"
     else:
         return 'Wrong secret'
 

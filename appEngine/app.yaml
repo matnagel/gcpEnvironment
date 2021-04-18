@@ -13,3 +13,4 @@ handlers:
 
 env_variables:
     VALHEIMSECRET: {{ valheimsecret }}
+    VALHEIMTOPIC: {{ valheimtopic }}
