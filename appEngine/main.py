@@ -2,6 +2,7 @@ from flask import Flask, request
 
 import os
 from datetime import datetime, time
+import pytz
 
 from google.cloud import pubsub_v1
 
@@ -9,7 +10,10 @@ from google.cloud import pubsub_v1
 # called `app` in `main.py`.
 app = Flask(__name__)
 
+local_timezone = pytz.timezone('Europe/Berlin')
+
 publisher = pubsub_v1.PublisherClient()
+
 
 @app.route('/')
 def hello():
@@ -27,8 +31,8 @@ def checkValheimPreconditions(secret_input):
     if not secret == secret_input:
         return 'Wrong secret'
 
-    now_time = datetime.now().time()
-    time_cond = now_time >= time(17, 0) and now_time <= time(21, 30)
+    now_time = datetime.now(tz=pytz.utc).time()
+    time_cond = now_time >= time(17, 0, tzinfo=local_timezone) and now_time <= time(21, 30, tzinfo=local_timezone)
     if not time_cond:
         return f'{now_time} not between 17:00 and 21:30'
     return False
