@@ -29,7 +29,8 @@ def valheim():
         topic_path = publisher.topic_path(
                 os.environ['GOOGLE_CLOUD_PROJECT'],
                 topic_name)
-        return f"Sending message to {topic_name} to start server"
+        publisher.publish(topic_path, data='start')
+        return f"Message to {topic_name} to start server was sent"
     else:
         return 'Wrong secret'
 
