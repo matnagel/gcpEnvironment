@@ -1,4 +1,5 @@
 from flask import Flask
+import os
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
@@ -12,8 +13,18 @@ def hello():
 @app.route('/cert/')
 def cert():
     """This handler makes flask redirect '/cert' to '/cert/', which then
-    gets caught by app.yaml."""
+    gets caught by app.yaml. This gets never called"""
     return 'cert - Hello World!'
+
+@app.route('/valheim/start')
+def valheim():
+    """Starts the valheim server"""
+    secret = os.getenv('VALHEIMSECRET')
+    secret_input = request.args.get('secret')
+    if secret == secret_input:
+        return 'Starting Server'
+    else:
+        return 'Wrong secret'
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App

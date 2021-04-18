@@ -10,3 +10,6 @@ handlers:
   upload: content/index.html
 - url: /cert
   static_dir: content
+
+env_variables:
+    VALHEIMSECRET: {{ valheimsecret }}
