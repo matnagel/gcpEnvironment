@@ -31,13 +31,14 @@ def checkValheimPreconditions(secret_input):
     if not secret == secret_input:
         return 'Wrong secret'
 
-    now_time = datetime.now(tz=pytz.utc).timetz()
-    time_cond = now_time >= time(17, 0, tzinfo=local_timezone) and now_time <= time(21, 30, tzinfo=local_timezone)
+    now_time = datetime.now(tz=pytz.utc)
+    now_date_local = datetime.now(tz=local_timezone).date()
+    begin_time = datetime.combine(now_date_local, time(17,0), tzinfo=local_timezone)
+    end_time = datetime.combine(now_date_local, time(21,27), tzinfo=local_timezone)
+    time_cond = now_time >= begin_time and now_time <= end_time
     if not time_cond:
-        return f'{now_time} not between 17:00 and 21:30'
+        return f'{now_time.astimezone(local_timezone)} not between {begin_time.astimezone(local_timezone)} and {end_time.astimezone(local_timezone)}'
     return False
-
-
 
 @app.route('/valheim/start')
 def valheim():
