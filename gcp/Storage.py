@@ -24,3 +24,8 @@ class Bucket:
         blob = Blob(blobname, self.bucket)
         content = StringIO(string)
         blob.upload_from_file(content)
+    def readFromBlob(self, blobname):
+        blob = Blob(blobname, self.bucket)
+        with blob.open("rt") as f:
+            text = f.read()
+        return text
