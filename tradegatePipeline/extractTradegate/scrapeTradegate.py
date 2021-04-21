@@ -15,7 +15,7 @@ class PageScrape:
 
 
 class Stock:
-    isinPattern = re.compile('^[A-Z]{2}[0-9]+$')
+    isinPattern = re.compile('^[A-Z]{2}[A-Z0-9]{10}$')
     def __init__(self, isin):
         match = self.isinPattern.match(isin)
         if not match:

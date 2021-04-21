@@ -24,32 +24,19 @@ class testScrape(TestCase):
         rqPatch = patch('scrapeTradegate.rq.get', return_value=Page())
         #source.query().limit().return_value = ['US3434', 'DE78322']
         strIO = patch('gcp.Storage.StringIO', Mock)
-        stockListPatch = patch('gcp.Storage.Bucket.readFromBlob', return_value="US3434\nDE7832")
+        stockListPatch = patch('gcp.Storage.Bucket.readFromBlob', return_value="US02079K3059\nDE0005190003")
         with strIO, stockListPatch, rqPatch:
             pubsubEntryPoint(None, None)
 
     def testSplitText(self):
-        stockListPatch = patch('gcp.Storage.Bucket.readFromBlob', return_value="US3434\nDE7832")
+        stockListPatch = patch('gcp.Storage.Bucket.readFromBlob', return_value="US02079K3059\nDE0005190003")
         with stockListPatch:
             bucket = Bucket("tradegatescrapes")
             ls = loadListOfStocks(bucket)
             self.assertEqual(len(ls), 2) 
 
-    def testSplitText2(self):
-        stockListPatch = patch('gcp.Storage.Bucket.readFromBlob', return_value="US3434\n\nDE7832")
-        with stockListPatch:
-            bucket = Bucket("tradegatescrapes")
-            ls = loadListOfStocks(bucket)
-            self.assertEqual(len(ls), 2) 
-
-    def testSplitText3(self):
+    def testNoISINStartsWithNumber(self):
         stockListPatch = patch('gcp.Storage.Bucket.readFromBlob', return_value="5US3434\n\nDE7832")
-        with stockListPatch, self.assertRaises(ValueError):
-            bucket = Bucket("tradegatescrapes")
-            ls = loadListOfStocks(bucket)
-
-    def testSplitText4(self):
-        stockListPatch = patch('gcp.Storage.Bucket.readFromBlob', return_value="US3434A\n\nDE7832")
         with stockListPatch, self.assertRaises(ValueError):
             bucket = Bucket("tradegatescrapes")
             ls = loadListOfStocks(bucket)
