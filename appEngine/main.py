@@ -33,8 +33,8 @@ def checkValheimPreconditions(secret_input):
 
     now_time = datetime.now(tz=pytz.utc)
     now_date_local = datetime.now(tz=local_timezone).date()
-    begin_time = datetime.combine(now_date_local, time(17,0), tzinfo=local_timezone)
-    end_time = datetime.combine(now_date_local, time(21,27), tzinfo=local_timezone)
+    begin_time = local_timezone.localize(datetime.combine(now_date_local, time(17,0)))
+    end_time = local_timezone.localize(datetime.combine(now_date_local, time(21,27)))
     time_cond = now_time >= begin_time and now_time <= end_time
     if not time_cond:
         return f'{now_time.astimezone(local_timezone)} not between {begin_time.astimezone(local_timezone)} and {end_time.astimezone(local_timezone)}'
