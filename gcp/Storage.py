@@ -25,7 +25,9 @@ class Bucket:
         content = StringIO(string)
         blob.upload_from_file(content)
     def readFromBlob(self, blobname):
-        blob = Blob(blobname, self.bucket)
+        blob = self.bucket.get_blob(blobname)
+        if not blob:
+            raise ValueError(f"Could not get blob for {blobname}")
         with blob.open("rt") as f:
             text = f.read()
         return text
