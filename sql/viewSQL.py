@@ -14,6 +14,6 @@ for priceInfo in query:
 print('\n')
 
 print(f'Stock - Number of rows: {source.query(Stock).count()}')
-query = source.query(Stock).limit(5)
+query = source.query(Stock)
 for stock in query:
-    print(stock)
+    print(stock.isin)
