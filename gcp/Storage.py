@@ -26,6 +26,7 @@ class Bucket:
         blob.upload_from_file(content)
     def readFromBlob(self, blobname):
         blob = self.bucket.get_blob(blobname)
+        print(blob)
         if not blob:
             raise ValueError(f"Could not get blob for {blobname}")
         with blob.open("rt") as f:
